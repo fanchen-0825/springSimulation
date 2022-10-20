@@ -2,9 +2,12 @@ package com.FCfactory.spring;
 
 import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FCApplicationContext {
     private Class config;
+    private Map<String, BeanDefinition> beanDefinitionMap = new HashMap<>();
 
     public FCApplicationContext(Class config) {
         this.config = config;
@@ -46,25 +49,43 @@ public class FCApplicationContext {
                         className = className.replace("\\", ".");
                         Class<?> bean = null;
                         try {
-                            //拿到类名
+                            //利用反射 拿到类
                             bean = classLoader.loadClass(className);
 
-                            //判断该文件是否是bean（是否有component注解）
+                            //判断该类是否是bean（是否有component注解）
                             if (bean.isAnnotationPresent(Component.class)) {
                                 //就是一个bean
+
+                                //获得该bean的注解
+                                Component componentAnnotation = bean.getAnnotation(Component.class);
+                                //获得注解中的值（就是bean的名字）
+                                String beanName = componentAnnotation.value();
+                                //获得beanDefinition
+                                BeanDefinition beanDefinition = new BeanDefinition();
+                                //设置bean类型
+                                beanDefinition.setType(bean);
+                                //判断是否有scope注解（判断是单例还是多例）
+                                if (bean.isAnnotationPresent(Scope.class)) {
+                                    Scope scopeAnnotation = bean.getAnnotation(Scope.class);
+                                    String scope = scopeAnnotation.value();
+                                    beanDefinition.setScope(scope);
+                                } else {
+                                    //一定是单例
+                                    beanDefinition.setScope("singleton");
+                                }
+                                //将beanDefinition存入集合保存
+                                beanDefinitionMap.put(beanName, beanDefinition);
                             }
                         } catch (ClassNotFoundException e) {
                             throw new RuntimeException(e);
                         }
-
-
                     }
                 }
             }
         }
     }
 
-    public Object getBean(String name){
+    public Object getBean(String name) {
         return null;
     }
 }
