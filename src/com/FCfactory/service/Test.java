@@ -6,9 +6,12 @@ public class Test {
 
 
     public static void main(String[] args) {
-        FCApplicationContext context=new FCApplicationContext(AppConfig.class);
+        FCApplicationContext context = new FCApplicationContext(AppConfig.class);
 
-        UserService userService = (UserService) context.getBean("UserService");
+        System.out.println(context.getBean("userService"));
+        System.out.println(context.getBean("userService"));
+        System.out.println(context.getBean("userService"));
+        System.out.println(context.getBean("userService"));
 
     }
 }
